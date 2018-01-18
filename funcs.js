@@ -29,9 +29,9 @@ module.exports.encodeName = function (name) {
   return encode("@" + name)
 }
 
-/*module.exports.decodeName = function (codeName){
+module.exports.decodeName = function (codeName){
   return decode(codeName)
-}*/
+}
 
 /**
  * Load the database
@@ -89,7 +89,7 @@ module.exports.findInbox = function (db, encodedName) {
 module.exports.findNextMessage = function (inbox, lastHash) {
   // find the message which comes after lastHash
   var found
-  //console.log(inbox.messages);
+  console.log(inbox.dir);
   //console.log(inbox.messages.length)
   for (var i = 0; i < inbox.messages.length; i ++) {
     if (inbox.messages.lastHash === lastHash) {
@@ -105,6 +105,7 @@ module.exports.findNextMessage = function (inbox, lastHash) {
   }
 
   // read and decode the message
+  console.log(path.join(inbox.dir, inbox.messages.hash));
   return /*'to: ' + decode(inbox.messages.to) + '\n---\n' + */'from: ' + decode(inbox.messages.from) + '\n---\n' +
-    decode(fs.readFile(path.join(inbox.dir, inbox.messages.hash), 'utf8'))
+    decode(fs.readFileSync(path.join(inbox.dir, inbox.messages.hash),'utf8'));
 }
