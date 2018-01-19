@@ -61,20 +61,24 @@ module.exports.loadDb = function (dbFile, cb) {
  */
 module.exports.findInbox = function (db, encodedName) {
   var messages = db.messages
+  var first
+  var last
   //console.log(messages[0].last);
   return {
     dir: path.dirname(db.file),
     messages: Object.keys(messages).reduce(function (acc, key) {
+      first = acc;
       if (!acc) console.log("error")
       else{
         if (messages[key].to === encodedName) {
           //console.log(messages[key].to);
-        return {
+        last =  {
           hash: key,
           to: messages[key].to,
           lastHash: messages[key].last,
           from: messages[key].from
         }
+        return [acc,last];
       } else { return acc }
     }
   },[])
@@ -89,13 +93,17 @@ module.exports.findInbox = function (db, encodedName) {
 module.exports.findNextMessage = function (inbox, lastHash) {
   // find the message which comes after lastHash
   var found
-  console.log(inbox.dir);
-  //console.log(inbox.messages.length)
+  /*console.log(inbox.dir)
+  console.log('\n\n--------\n\n')
+  console.log(inbox.messages.length)
+  console.log('\n\n--------\n\n')
+  console.log(inbox.messages)
+  console.log('\n\n--------\n\n')*/
   for (var i = 0; i < inbox.messages.length; i ++) {
-    if (inbox.messages.lastHash === lastHash) {
+    if (inbox.messages[i].lastHash === lastHash) {
       found = i
-      /*console.log(inbox.messages[i]);
-      console.log(found);
+      /*console.log(found);
+      console.log(inbox.messages[i]);
       console.log(inbox.messages[i].to);
       console.log(inbox.messages[i].from);
       console.log(inbox.messages[i].last);*/
@@ -105,7 +113,7 @@ module.exports.findNextMessage = function (inbox, lastHash) {
   }
 
   // read and decode the message
-  console.log(path.join(inbox.dir, inbox.messages.hash));
-  return /*'to: ' + decode(inbox.messages.to) + '\n---\n' + */'from: ' + decode(inbox.messages.from) + '\n---\n' +
-    decode(fs.readFileSync(path.join(inbox.dir, inbox.messages.hash),'utf8'));
+  //console.log(path.join(inbox.dir, inbox.messages[found].hash));
+  return /*'to: ' + decode(inbox.messages.to) + '\n---\n' + */'from: ' + decode(inbox.messages[found].from) + '\n---\n' +
+    decode(fs.readFileSync(path.join(inbox.dir, inbox.messages[found].hash),'utf8'));
 }
